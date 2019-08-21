@@ -1,113 +1,113 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i&display=swap&subset=cyrillic,cyrillic-ext,greek,greek-ext,latin-ext,vietnamese');
-
 html, body {
-    font-family: 'Roboto', Arial, Helvetica, sans-serif;
+  font-family: 'Roboto', Arial, Helvetica, sans-serif;
 }
 
 body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .calculator {
-    margin-top: 50px;
-    display: flex;
-    flex-direction: column;
-    justify-content: stretch;
-    align-items: stretch;
-    width: 300px;
-    height: 546px;
-    padding: 7px;
-    border: 1px solid #EEE;
-    border-radius: 3px;
+  margin-top: 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  align-items: stretch;
+  width: 300px;
+  height: 546px;
+  padding: 7px;
+  border: 1px solid #EEE;
+  border-radius: 3px;
 }
 
 .history-display {
-    height: 50px;
-    width: 100%;
-    flex-shrink: 0;
+  height: 50px;
+  width: 100%;
+  flex-shrink: 0;
 }
 
 .main-display {
-    display: flex;
-    justify-content: flex-end;
-    align-items: flex-end;
-    flex-shrink: 0;
-    height: 115px;
-    padding-right: 5px;
-    padding-bottom: 5px;
-    font-size: 80pt;
-    font-weight: 300;
-    color: #666;
-    line-height: 60pt;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  flex-shrink: 0;
+  height: 115px;
+  padding-right: 5px;
+  padding-bottom: 5px;
+  font-size: 80pt;
+  font-weight: 300;
+  color: #666;
+  line-height: 60pt;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .buttons-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: stretch;
-    align-items: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  align-items: stretch;
 }
 
 .calculator-row {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 
 .calculator-button {
-    width: 60px;
-    height: 60px;
-    margin: 7.5px;
-
-    font-size: 30px;
-    font-family: 'Roboto', Arial, Helvetica, sans-serif;
-
-    background-color: transparent;
-    color: #707070;
-    border: none;
+  width: 60px;
+  height: 60px;
+  margin: 7.5px;
+  font-size: 30px;
+  font-family: 'Roboto', Arial, Helvetica, sans-serif;
+  background-color: transparent;
+  color: #707070;
+  border: none;
 }
 
 .orange {
-    color: #EE7D4A;
+  color: #EE7D4A;
 }
 
-.equals-button {
-    color: white;
-    background-color: #EE7D4A;
-    border-radius: 10px;
-    font-size: 30px;
+#equals-button {
+  color: white;
+  background-color: #EE7D4A;
+  border-radius: 10px;
+  font-size: 30px;
 }
 
 svg {
-    height: 30px;
-    width: 30px;
-    fill: #EE7D4A;
-    position: relative;
-    top: 3px;
-    right: 3px;
+  height: 30px;
+  width: 30px;
+  fill: #EE7D4A;
+  position: relative;
+  top: 3px;
+  right: 3px;
 }
 
 .attribution {
-    margin-top: 40px;
-    font-size: 11pt;
-    color: #666;
+  margin-top: 40px;
+  font-size: 11pt;
+  color: #666;
 }
 
 .attribution a {
-    text-decoration: none;
-    color: #333;
+  text-decoration: none;
+  color: #333;
 }
 
 .attribution a:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
 button {
-    outline: none;
+  outline: none;
 }
 
 button:active {
-    padding: 0;
+  padding: 0;
 }
