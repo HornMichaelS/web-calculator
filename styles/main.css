@@ -1,4 +1,9 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i&display=swap&subset=cyrillic,cyrillic-ext,greek,greek-ext,latin-ext,vietnamese');
+:root {
+  --main-color: hsl(199deg, 100%, 61%);
+  --secondary-color: hsl(199deg, 50%, 51%);
+}
+
 html, body {
   font-family: 'Roboto', Arial, Helvetica, sans-serif;
 }
@@ -70,20 +75,20 @@ body {
 }
 
 .orange {
-  color: #EE7D4A;
+  color: var(--main-color);
 }
 
 #equals-button {
   color: white;
-  background-color: #EE7D4A;
-  border-radius: 10px;
+  background-color: var(--main-color);
+  border-radius: 30%;
   font-size: 30px;
 }
 
 svg {
   height: 30px;
   width: 30px;
-  fill: #EE7D4A;
+  fill: var(--main-color);
   position: relative;
   top: 3px;
   right: 3px;
@@ -106,6 +111,14 @@ svg {
 
 button {
   outline: none;
+  cursor: pointer;
+  transition: opacity 0.3s;
+  transition: color 0.3s;
+}
+
+button:active {
+  opacity: 0.8;
+  color: var(--secondary-color);
 }
 
 button:active {

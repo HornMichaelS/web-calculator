@@ -1,136 +1,180 @@
-const operations = Object.freeze({
-  '±': (n) => -n,
-  '%': (n) => n / 100,
-  '÷': (m, n) => m / n,
-  '×': (m, n) => m * n,
-  '−': (m, n) => m - n,
-  '+': (m, n) => m + n,
-});
+let calculatorState = {
+  r1: '0',
+  r2: '0',
+  shouldShift: false,
+  pendingOperation: null,
+  replaceOperation: false,
+  repeatOperation: false,
+};
 
-function Calculator() {
-  let storedOperand;
-  let currentValue = 0;
-  let displayLength = 1;
-  let decimalPressed = false;
-  let listener;
-  let pendingOperation;
-  let previousOperation;
-  let replaceCurrentValue = false;
-
-  function notify() {
-    if (listener !== undefined && typeof listener === 'function') {
-      listener(currentValue);
-    }
-  }
-
-  this.pressDigit = (number) => {
-    if (typeof number !== 'number' || number < 0 || number > 9) {
-      return;
-    }
-
-    if (replaceCurrentValue) {
-      storedOperand = currentValue;
-      currentValue = 0;
-      replaceCurrentValue = false;
-    }
-
-    if (String(currentValue).length > 11) {
-      return;
-    }
-
-    let newValString = String(currentValue);
-
-    if (decimalPressed && !newValString.includes('.')) {
-      newValString += '.';
-      decimalPressed = false;
-    }
-
-    newValString += number;
-
-    currentValue = parseFloat(newValString);
-
-    notify();
-  };
-
-  this.pressDecimal = function () {
-    decimalPressed = true;
-  }
-
-  this.pressBackspace = function () {
-    currentValue = parseFloat(
-      String(currentValue).slice(0, -1)
-    ) || 0;
-    decimalPressed = false;
-    notify();
-  }
-
-  this.pressClear = function () {
-    currentValue = 0;
-    decimalPressed = false;
-    pendingOperation = null;
-    notify();
-  }
-
-  this.pressOperation = function (operation) {
-    previousOperation = null;
-
-    if ('±%'.includes(operation)) {
-      currentValue = operations[operation](currentValue);
-      replaceCurrentValue = false;
-      notify();
-      return;
-    }
-
-    console.log(operation);
-
-    storedOperand = currentValue;
-    pendingOperation = operations[operation];
-    replaceCurrentValue = true;
-    console.log(pendingOperation);
-  }
-
-  this.pressEquals = function () {
-    console.log('pressEquals', currentValue, storedOperand);
-    if (previousOperation) {
-
-    }
-    if (pendingOperation) {
-      const result = pendingOperation(storedOperand, currentValue);
-      storedOperand = currentValue;
-      currentValue = result;
-      notify();
-    }
-    replaceCurrentValue = true;
-  }
-
-  this.getValue = function () {
-    return currentValue;
-  }
-
-  this.addListener = function (newListener) {
-    listener = newListener;
-  };
-}
-
-const calculator = new Calculator();
-
-function adjustDisplayFontSize(display, value) {
-  if (String(value).length < 5) {
+function renderCalculator(calculatorState) {
+  const display = document.querySelector('.main-display');
+  const numChars = calculatorState.r1.length;
+  if (numChars < 5) {
     display.style.fontSize = '80pt';
-  } else if (String(value).length < 8) {
-    display.style.fontSize = '50pt';
+    display.style.lineHeight = '60pt';
+  } else if (numChars < 9) {
+    display.style.fontSize = '45pt';
+    display.style.lineHeight = '35pt';
   } else {
     display.style.fontSize = '30pt';
+    display.style.lineHeight = '22.5pt';
+  }
+
+  display.textContent = numChars > 12
+    ? parseFloat(calculatorState.r1).toExponential(7)
+    : calculatorState.r1
+}
+
+function setState(state) {
+  calculatorState = Object.assign(calculatorState, state);
+  console.log(calculatorState);
+  renderCalculator(calculatorState);
+}
+
+function performPendingOperation() {
+  const { pendingOperation, repeatOperation, r1, r2 } = calculatorState;
+
+  if (!pendingOperation) {
+    setState({
+      shouldShift: true,
+    })
+    return;
+  }
+
+  if (repeatOperation) {
+    const result = pendingOperation(parseFloat(r1), parseFloat(r2));
+    setState({
+      r1: result.toString(),
+      shouldShift: true,
+    })
+  } else {
+    const result = pendingOperation(parseFloat(r2), parseFloat(r1));
+    setState({
+      r1: result.toString(),
+      r2: r1,
+      shouldShift: true,
+      repeatOperation: true,
+    })
   }
 }
 
-function onNewCalculatorValue(value) {
-  const mainDisplay = document.querySelector('.main-display');
-  adjustDisplayFontSize(mainDisplay, value);
-  mainDisplay.textContent = value;
+function isUnary(operation) {
+  return '±%'.includes(operation);
 }
 
-calculator.addListener(onNewCalculatorValue);
+function setOperation(operation) {
+  const operations = Object.freeze({
+    '±': (n) => -n,
+    '%': (n) => n / 100,
+    '÷': (m, n) => m / n,
+    '×': (m, n) => m * n,
+    '−': (m, n) => m - n,
+    '+': (m, n) => m + n,
+  });
+
+  const { r1, r2, pendingOperation, replaceOperation } = calculatorState;
+
+  if (isUnary(operation)) {
+    setState({
+      r1: operations[operation](calculatorState.r1).toString(),
+    });
+  } else {
+    if (pendingOperation && !replaceOperation) {
+      setState({
+        r1: pendingOperation(r2, r1).toString(),
+        r2: r1,
+        shouldShift: true,
+        pendingOperation: operations[operation],
+        replaceOperation: true,
+        repeatOperation: false,
+      });
+    } else {
+      setState({
+        pendingOperation: operations[operation],
+        repeatOperation: false,
+        shouldShift: true,
+      });
+    }
+  }
+}
+
+function concatDigit(digit) {
+  const { r1, shouldShift } = calculatorState;
+
+  if (shouldShift) {
+    setState({
+      r1: `${digit}`,
+      r2: r1,
+      shouldShift: false,
+      replaceOperation: false,
+      repeatOperation: false,
+    })
+  } else {
+    setState({
+      r1: r1 === '0' ? `${digit}` : `${r1}${digit}`,
+      replaceOperation: false,
+      repeatOperation: false,
+    });
+  }
+}
+
+function concatDecimal() {
+  const { r1, shouldShift } = calculatorState;
+
+  if (shouldShift) {
+    setState({
+      r1: '0.',
+      r2: r1,
+      shouldShift: false,
+      replaceOperation: false,
+      repeatOperation: false,
+    })
+  } else {
+    setState({
+      r1: r1.includes('.') ? r1 : `${r1}.`,
+      replaceOperation: false,
+      repeatOperation: false,
+    });
+  }
+}
+
+function clear() {
+  setState({
+    r1: '0',
+    r2: '0',
+    shouldShift: false,
+    pendingOperation: null,
+    replaceOperation: false,
+    repeatOperation: false,
+  });
+}
+
+function backspace() {
+  const { r1, shouldShift } = calculatorState;
+
+  const replaceOperation = false;
+  const pendingOperation = null;
+
+  if (shouldShift) {
+    setState({
+      r1: '0',
+      r2: '0',
+      shouldShift: false,
+      pendingOperation,
+      replaceOperation,
+      repeatOperation: false,
+    })
+  } else {
+    const newValue = r1.length < 2 ? '0' : r1.split('').slice(0, -1).join('');
+    setState({
+      r1: newValue === '-' ? '0' : newValue,
+      pendingOperation,
+      replaceOperation,
+      repeatOperation,
+    });
+  }
+}
 
 function addClickListener(selector, callback) {
   const elem = document.querySelector(selector);
@@ -144,28 +188,28 @@ digitButtons.forEach(button => {
   const digit = parseInt(button.textContent);
   button.addEventListener(
     'click',
-    calculator.pressDigit.bind(calculator, digit)
+    concatDigit.bind(null, digit)
   )
 });
 
 addClickListener(
   '#backspace-button',
-  calculator.pressBackspace.bind(calculator),
+  backspace
 );
 
 addClickListener(
   '#clear-button',
-  calculator.pressClear.bind(calculator),
+  clear,
 );
 
 addClickListener(
   '#decimal-button',
-  calculator.pressDecimal.bind(calculator),
+  concatDecimal,
 );
 
 addClickListener(
   '#equals-button',
-  calculator.pressEquals.bind(calculator),
+  performPendingOperation,
 )
 
 const operationButtons = document.querySelectorAll('.operation');
@@ -173,6 +217,6 @@ operationButtons.forEach(button => {
   const operation = button.textContent;
   button.addEventListener(
     'click',
-    calculator.pressOperation.bind(calculator, operation)
+    setOperation.bind(null, operation),
   );
 });
